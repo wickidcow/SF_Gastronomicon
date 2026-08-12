@@ -38,9 +38,24 @@ jobs:
 
       - name: Publish current Slimefun Legacy API to Maven local
         working-directory: slimefun-legacy
+        shell: bash
         run: |
+          set -euo pipefail
           chmod +x gradlew
-          ./gradlew publishToMavenLocal -PprojectVersion=Legacy-SNAPSHOT -x test --no-daemon
+
+          for attempt in 1 2 3; do
+            echo "Slimefun Legacy publish attempt ${attempt}/3"
+            if ./gradlew publishToMavenLocal -PprojectVersion=Legacy-SNAPSHOT -x test --no-daemon; then
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 3 ]; then
+              echo "Slimefun Legacy dependency publish failed after 3 attempts."
+              exit 1
+            fi
+
+            sleep $((attempt * 10))
+          done
 
       - name: Build Gastronomicon
         working-directory: gastronomicon
