@@ -15,6 +15,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      jar_name: ${{ steps.output.outputs.name }}
+      jar_url: ${{ steps.publish.outputs.jar_url }}
 
     steps:
       - name: Checkout Gastronomicon
@@ -53,18 +56,21 @@ jobs:
         run: |
           VERSION="$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)"
           JAR="target/SF_Gastronomicon${VERSION}.jar"
+          NAME="SF_Gastronomicon${VERSION}.jar"
           test -f "$JAR"
           jar tf "$JAR" >/dev/null
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "jar=$JAR" >> "$GITHUB_OUTPUT"
-          echo "name=SF_Gastronomicon${VERSION}.jar" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
 
       - name: Publish direct JAR release asset
+        id: publish
         working-directory: gastronomicon
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.output.outputs.version }}
           JAR: ${{ steps.output.outputs.jar }}
+          NAME: ${{ steps.output.outputs.name }}
         shell: bash
         run: |
           TAG="v${VERSION}"
@@ -73,5 +79,22 @@ jobs:
           else
             gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" \
               --title "SF Gastronomicon ${VERSION}" \
-              --notes "Paper 26.2 / Slimefun Legacy build. Download SF_Gastronomicon${VERSION}.jar directly from this release."
+              --notes "Paper 26.2 / Slimefun Legacy build. Download ${NAME} directly from this release."
           fi
+
+          JAR_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${NAME}"
+          echo "jar_url=$JAR_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Show direct JAR build output
+        env:
+          NAME: ${{ steps.output.outputs.name }}
+          JAR_URL: ${{ steps.publish.outputs.jar_url }}
+        shell: bash
+        run: |
+          {
+            echo "## Build Output"
+            echo
+            echo "### [⬇️ Download ${NAME}](${JAR_URL})"
+            echo
+            echo "Direct Java archive — no ZIP extraction required."
+          } >> "$GITHUB_STEP_SUMMARY"
