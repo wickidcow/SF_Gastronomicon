@@ -32,7 +32,9 @@ jobs:
           python3 gastronomicon/.github/scripts/modernize_26_2.py
           python3 - <<'PY'
           from pathlib import Path
-          pom = Path('gastronomicon/pom.xml')
+
+          root = Path('gastronomicon')
+          pom = root / 'pom.xml'
           text = pom.read_text(encoding='utf-8')
           text = text.replace(
               '<paper.version>[26.2.build,26.3.build)</paper.version>',
@@ -54,10 +56,24 @@ jobs:
                     </annotationProcessorPaths>'''
           if needle not in text:
               raise SystemExit('Maven compiler release element not found')
-          text = text.replace(needle, processor, 1)
-          pom.write_text(text, encoding='utf-8')
+          pom.write_text(text.replace(needle, processor, 1), encoding='utf-8')
 
-          workflow = Path('gastronomicon/.github/workflows/build.yml')
+          # Bukkit/Paper renamed these legacy constants before the 1.21.11 API line.
+          api_names = {
+              'ItemFlag.HIDE_POTION_EFFECTS': 'ItemFlag.HIDE_ADDITIONAL_TOOLTIP',
+              'PotionEffectType.INCREASE_DAMAGE': 'PotionEffectType.STRENGTH',
+              'PotionEffectType.DAMAGE_RESISTANCE': 'PotionEffectType.RESISTANCE',
+              'PotionEffectType.CONFUSION': 'PotionEffectType.NAUSEA',
+          }
+          for java in (root / 'src/main/java').rglob('*.java'):
+              data = java.read_text(encoding='utf-8')
+              updated = data
+              for old, new in api_names.items():
+                  updated = updated.replace(old, new)
+              if updated != data:
+                  java.write_text(updated, encoding='utf-8')
+
+          workflow = root / '.github/workflows/build.yml'
           w = workflow.read_text(encoding='utf-8')
           w = w.replace('actions/checkout@v4', 'actions/checkout@v5')
           w = w.replace('actions/setup-java@v4', 'actions/setup-java@v5')
