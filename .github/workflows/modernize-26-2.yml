@@ -58,7 +58,6 @@ jobs:
               raise SystemExit('Maven compiler release element not found')
           pom.write_text(text.replace(needle, processor, 1), encoding='utf-8')
 
-          # Bukkit/Paper renamed these legacy constants before the 1.21.11 API line.
           api_names = {
               'ItemFlag.HIDE_POTION_EFFECTS': 'ItemFlag.HIDE_ADDITIONAL_TOOLTIP',
               'PotionEffectType.INCREASE_DAMAGE': 'PotionEffectType.STRENGTH',
@@ -72,13 +71,6 @@ jobs:
                   updated = updated.replace(old, new)
               if updated != data:
                   java.write_text(updated, encoding='utf-8')
-
-          workflow = root / '.github/workflows/build.yml'
-          w = workflow.read_text(encoding='utf-8')
-          w = w.replace('actions/checkout@v4', 'actions/checkout@v5')
-          w = w.replace('actions/setup-java@v4', 'actions/setup-java@v5')
-          w = w.replace('mvn -B -U clean package', 'mvn -B clean package')
-          workflow.write_text(w, encoding='utf-8')
           PY
 
       - name: Set up Java 25
@@ -101,12 +93,17 @@ jobs:
           test -f target/SF_Gastronomicon1.1.4.jar
           jar tf target/SF_Gastronomicon1.1.4.jar >/dev/null
 
-      - name: Commit modernized source and workflow
+      - name: Commit modernized source
         id: commit
         working-directory: gastronomicon
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # GitHub's workflow token cannot create/update workflow files. Keep the
+          # bootstrap .github state unchanged here; ChatGPT's connected GitHub app
+          # will replace it with the permanent build workflow after this verified push.
+          git restore --source=HEAD --staged --worktree .github
+          git clean -fd .github
           git add -A
           git commit -m "Modernize Gastronomicon for Paper 26.2 and Slimefun Legacy"
           git push origin HEAD:master
