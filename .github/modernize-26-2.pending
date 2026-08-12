@@ -1,2 +1,2 @@
 Paper 26.2 + Slimefun Legacy modernization requested 2026-08-11.
-Retry 3: enabled explicit Lombok annotation processing for JDK 25.
+Retry 4: whitespace-safe explicit Lombok processor injection.
