@@ -17,26 +17,32 @@ public class DynaTechSetup {
     private static SlimefunItem gc;
     private static SlimefunItem gc2;
 
-    private static void register(int seconds, ItemStack... outputs) {
+    private static boolean register(SlimefunItem chamber, int seconds, ItemStack[] inputs, ItemStack[] outputs) {
+        if (chamber == null) return false;
         try {
-            final Method register = gc.getClass().getMethod(
+            final Method method = chamber.getClass().getMethod(
                 "registerRecipe", int.class, ItemStack[].class, ItemStack[].class);
-
-            register.invoke(gc, seconds, new ItemStack[] { outputs[0].asOne() }, outputs);
-            register.invoke(gc2, seconds,
-            new ItemStack[] { outputs[0].asOne() },
-            Arrays.stream(outputs).map(itemStack -> itemStack.asQuantity(itemStack.getAmount() * 3))
-                .toArray(ItemStack[]::new));
-            
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            return;
+            method.invoke(chamber, seconds, inputs, outputs);
+            return true;
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored) {
+            return false;
         }
     }
 
-    public static void setup() {
-        // Assume DynaTech is installed, and the config option is enabled
+    private static boolean register(int seconds, ItemStack... outputs) {
+        if (outputs.length == 0) return false;
+        final ItemStack[] inputs = { outputs[0].asOne() };
+        boolean registered = register(gc, seconds, inputs, outputs);
+        final ItemStack[] mk2Outputs = Arrays.stream(outputs)
+            .map(itemStack -> itemStack.asQuantity(itemStack.getAmount() * 3))
+            .toArray(ItemStack[]::new);
+        return register(gc2, seconds, inputs, mk2Outputs) || registered;
+    }
+
+    public static boolean setup() {
         gc = SlimefunItem.getById("GROWTH_CHAMBER");
         gc2 = SlimefunItem.getById("GROWTH_CHAMBER_MK2");
+        if (gc == null && gc2 == null) return false;
 
         register(60, GastroStacks.RICE.asQuantity(3));
         register(60, GastroStacks.QUINOA.asQuantity(3));
@@ -88,6 +94,6 @@ public class DynaTechSetup {
         register(60, GastroStacks.ENOKI_MUSHROOMS.asQuantity(2));
         register(60, GastroStacks.KING_OYSTER_MUSHROOM.asQuantity(2));
         register(60, GastroStacks.BUTTON_MUSHROOM.asQuantity(2));
+        return true;
     }
-
 }

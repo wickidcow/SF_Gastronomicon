@@ -95,7 +95,7 @@ public class FoodEffect {
         final int ph = (int) Math.ceil(h * PERFECT_MULTIPLIER_HEALTH);
         return new FoodEffect("&aHealth +" + h, "&aHealth +" + ph, (Player player, Boolean isPerfect) -> {
             player.setHealth(Math.min(player.getHealth() + (isPerfect ? ph : h),
-                player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
+                player.getAttribute(Attribute.MAX_HEALTH).getValue()));
         });
     }
 

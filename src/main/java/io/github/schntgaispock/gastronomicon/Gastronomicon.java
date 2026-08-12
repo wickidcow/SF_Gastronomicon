@@ -89,7 +89,9 @@ public class Gastronomicon extends AbstractAddon {
             try {
                 info("DynaTech was found on this server!");
                 info("Registering Gastronomicon crops with DynaTech...");
-                DynaTechSetup.setup();
+                if (!DynaTechSetup.setup()) {
+                    warn("DynaTech has no compatible Growth Chambers; crop automation integration was skipped.");
+                }
             } catch (NoClassDefFoundError e) {
                 warn("This server is using an incompatitable version of DynaTech");
                 warn("Please keep Gastronomicon and DynaTech up to date!");
@@ -105,7 +107,9 @@ public class Gastronomicon extends AbstractAddon {
     @Override
     public void disable() {
         instance = null;
-        getPlayerData().save();
+        if (playerData != null) {
+            playerData.save();
+        }
     }
 
     public static NamespacedKey key(@Nonnull String name) {

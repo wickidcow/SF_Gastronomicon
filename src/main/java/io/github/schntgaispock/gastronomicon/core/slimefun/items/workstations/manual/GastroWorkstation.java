@@ -94,6 +94,7 @@ public abstract class GastroWorkstation extends MenuBlock {
         final Location l = menu.getLocation();
         menu.dropItems(l, getToolSlots());
         menu.dropItems(l, getContainerSlots());
+        lastInputHashAndRecipe.remove(l);
     }
 
     protected void onSuccessfulCraft(Block b) {}

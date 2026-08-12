@@ -30,6 +30,10 @@ public class FermenterRefillListener implements Listener {
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK || !e.getPlayer().isSneaking())
             return;
 
+        // PlayerInteractEvent can fire once for each hand. Only consume/refill from the main hand.
+        if (e.getHand() != org.bukkit.inventory.EquipmentSlot.HAND)
+            return;
+
         if (e.getItem() == null) {
             return;
         }
@@ -57,7 +61,7 @@ public class FermenterRefillListener implements Listener {
                 ret = Material.BUCKET;
                 break;
             case POTION:
-                if (((PotionMeta) e.getItem().getItemMeta()).getBasePotionData().getType() == PotionType.WATER) {
+                if (((PotionMeta) e.getItem().getItemMeta()).getBasePotionType() == PotionType.WATER) {
                     refill = 333;
                     ret = Material.GLASS_BOTTLE;
                     break;

@@ -21,29 +21,29 @@ public enum Climate {
 
     private final @Getter ItemStack displayItem;
 
-    public static Climate of(Biome b) {
-        return switch (b) {
-            case BADLANDS, WOODED_BADLANDS, ERODED_BADLANDS, DESERT, 
-                SAVANNA, WINDSWEPT_SAVANNA, SAVANNA_PLATEAU -> Climate.DRY;
-            case DEEP_FROZEN_OCEAN, OLD_GROWTH_PINE_TAIGA, TAIGA, 
-                OLD_GROWTH_SPRUCE_TAIGA, WINDSWEPT_HILLS, WINDSWEPT_FOREST, 
-                WINDSWEPT_GRAVELLY_HILLS, STONY_SHORE -> Climate.COLD;
-            case SNOWY_BEACH, SNOWY_PLAINS, ICE_SPIKES, FROZEN_RIVER, 
-                FROZEN_OCEAN, GROVE, SNOWY_SLOPES, SNOWY_TAIGA, 
-                JAGGED_PEAKS, FROZEN_PEAKS -> Climate.SNOWY;
-            case NETHER_WASTES, CRIMSON_FOREST, WARPED_FOREST, 
-                SOUL_SAND_VALLEY, BASALT_DELTAS -> Climate.NETHER;
-            case THE_END, SMALL_END_ISLANDS, END_BARRENS, END_MIDLANDS, 
-                END_HIGHLANDS, THE_VOID -> Climate.END;
-            default -> Climate.TEMPERATE;
+    public static Climate of(Biome biome) {
+        return switch (biome.getKey().getKey()) {
+            case "badlands", "wooded_badlands", "eroded_badlands", "desert",
+                "savanna", "windswept_savanna", "savanna_plateau" -> DRY;
+            case "deep_frozen_ocean", "old_growth_pine_taiga", "taiga",
+                "old_growth_spruce_taiga", "windswept_hills", "windswept_forest",
+                "windswept_gravelly_hills", "stony_shore" -> COLD;
+            case "snowy_beach", "snowy_plains", "ice_spikes", "frozen_river",
+                "frozen_ocean", "grove", "snowy_slopes", "snowy_taiga",
+                "jagged_peaks", "frozen_peaks" -> SNOWY;
+            case "nether_wastes", "crimson_forest", "warped_forest",
+                "soul_sand_valley", "basalt_deltas" -> NETHER;
+            case "the_end", "small_end_islands", "end_barrens", "end_midlands",
+                "end_highlands", "the_void" -> END;
+            default -> TEMPERATE;
         };
     }
 
-    public static Climate of(Block b) {
-        return of(b.getBiome());
+    public static Climate of(Block block) {
+        return of(block.getBiome());
     }
 
-    public static Climate of(Location l) {
-        return of(l.getBlock().getBiome());
+    public static Climate of(Location location) {
+        return of(location.getBlock().getBiome());
     }
 }

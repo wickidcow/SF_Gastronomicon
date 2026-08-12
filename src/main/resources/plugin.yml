@@ -1,34 +1,23 @@
 name: Gastronomicon
-
 author: SchnTgaiSpock
-
 description: A Slimefun addon that adds even more food to the game. Works best with ExoticGarden
-
 main: io.github.schntgaispock.gastronomicon.Gastronomicon
-
-website: https://github.com/SchnTgaiSpock/Gastronomicon
-
+website: https://github.com/wickidcow/SF_Gastronomicon
 version: ${project.version}
-
-api-version: 1.16
-
+api-version: '1.21'
 depend:
   - Slimefun
-
 softdepend:
   - SlimeHUD
   - ExoticGarden
-  - DynaTech # For automation
-
+  - DynaTech
 loadbefore:
   - SlimeCustomizer
-
 commands:
   gastronomicon:
     description: /gastronomicon
     aliases: [gastro, gn]
     usage: Press [tab] for usage hints
-
 permissions:
   gastronomicon:
     checkprofile:

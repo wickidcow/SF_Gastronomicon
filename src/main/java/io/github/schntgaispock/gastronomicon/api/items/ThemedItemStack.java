@@ -29,7 +29,7 @@ public class ThemedItemStack extends SlimefunItemStack {
     }
 
     public @Nonnull String getDisplayName() {
-        String name = getDisplayName();
+        String name = super.getDisplayName();
         return (name == null) ? "NO NAME GIVEN" : name;
     }
 
@@ -90,7 +90,7 @@ public class ThemedItemStack extends SlimefunItemStack {
     }
 
     public ThemedItemStack glisten() {
-        return enchant(Enchantment.DURABILITY).addFlags(ItemFlag.HIDE_ENCHANTS);
+        return enchant(Enchantment.UNBREAKING).addFlags(ItemFlag.HIDE_ENCHANTS);
     }
 
     public ThemedItemStack addFlags(ItemFlag... flags) {

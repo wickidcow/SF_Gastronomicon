@@ -121,7 +121,7 @@ public class WildHarvestListener implements Listener {
 
         final ItemStack weapon = p.getInventory().getItemInMainHand();
         final int fortune = weapon == null ? 0
-            : weapon.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+            : weapon.getEnchantmentLevel(Enchantment.FORTUNE);
         if (NumberUtil.flip(getDropChance(b.getType()) * (1 + fortune * 0.5))) {
             final ItemStack drop = drops.generate();
             if (drop == null) {
@@ -143,7 +143,7 @@ public class WildHarvestListener implements Listener {
 
         final Player killer = e.getEntity().getKiller();
         final int looting = (killer == null || killer.getInventory().getItemInMainHand() == null) ? 0
-            : killer.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS);
+            : killer.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOTING);
         if (NumberUtil.flip(getDropChance(e.getEntityType()) * (1 + looting * 0.5))) {
             final ItemStack drop = drops.generate();
             if (drop == null) {
@@ -254,13 +254,13 @@ public class WildHarvestListener implements Listener {
             .addItems(GastroStacks.SALMON_ROE)
             .build();
 
-        WildHarvestListener.registerBlockDrops(Material.GRASS, DRY_CLIMATE_GRASS_DROPS, Climate.DRY);
+        WildHarvestListener.registerBlockDrops(Material.SHORT_GRASS, DRY_CLIMATE_GRASS_DROPS, Climate.DRY);
         WildHarvestListener.registerBlockDrops(Material.TALL_GRASS, DRY_CLIMATE_GRASS_DROPS, Climate.DRY);
-        WildHarvestListener.registerBlockDrops(Material.GRASS, TEMPERATE_CLIMATE_GRASS_DROPS, Climate.TEMPERATE);
+        WildHarvestListener.registerBlockDrops(Material.SHORT_GRASS, TEMPERATE_CLIMATE_GRASS_DROPS, Climate.TEMPERATE);
         WildHarvestListener.registerBlockDrops(Material.TALL_GRASS, TEMPERATE_CLIMATE_GRASS_DROPS, Climate.TEMPERATE);
-        WildHarvestListener.registerBlockDrops(Material.GRASS, COLD_CLIMATE_GRASS_DROPS, Climate.COLD);
+        WildHarvestListener.registerBlockDrops(Material.SHORT_GRASS, COLD_CLIMATE_GRASS_DROPS, Climate.COLD);
         WildHarvestListener.registerBlockDrops(Material.TALL_GRASS, COLD_CLIMATE_GRASS_DROPS, Climate.COLD);
-        WildHarvestListener.registerBlockDrops(Material.GRASS, SNOWY_CLIMATE_GRASS_DROPS, Climate.SNOWY);
+        WildHarvestListener.registerBlockDrops(Material.SHORT_GRASS, SNOWY_CLIMATE_GRASS_DROPS, Climate.SNOWY);
         WildHarvestListener.registerBlockDrops(Material.TALL_GRASS, SNOWY_CLIMATE_GRASS_DROPS, Climate.SNOWY);
         WildHarvestListener.registerBlockDrops(Material.FERN, FERN_DROPS);
         WildHarvestListener.registerBlockDrops(Material.LARGE_FERN, FERN_DROPS);
