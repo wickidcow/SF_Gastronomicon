@@ -15,23 +15,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Gastronomicon
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           path: gastronomicon
 
       - name: Checkout Slimefun Legacy
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: wickidcow/Slimefun-Legacy
           ref: master
           path: slimefun-legacy
 
       - name: Apply modern compatibility patches
-        run: python3 gastronomicon/.github/scripts/modernize_26_2.py
+        run: |
+          python3 gastronomicon/.github/scripts/modernize_26_2.py
+          # Pin the latest Paper 26.2 stable seen by the compiler and use Jackson's
+          # actual annotations release number (2.22, not the databind 2.22.0 number).
+          sed -i 's#<paper.version>\[26.2.build,26.3.build)</paper.version>#<paper.version>26.2.build.112-stable</paper.version>#' gastronomicon/pom.xml
+          sed -i '/<artifactId>jackson-annotations<\/artifactId>/{n;s#<version>2.22.0</version>#<version>2.22</version>#;}' gastronomicon/pom.xml
+          sed -i 's#actions/checkout@v4#actions/checkout@v5#g; s#actions/setup-java@v4#actions/setup-java@v5#g; s#mvn -B -U clean package#mvn -B clean package#g' gastronomicon/.github/workflows/build.yml
 
       - name: Set up Java 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '25'
@@ -46,7 +52,7 @@ jobs:
         working-directory: gastronomicon
         run: |
           git diff --check
-          mvn -B -U clean package
+          mvn -B clean package
           test -f target/SF_Gastronomicon1.1.4.jar
           jar tf target/SF_Gastronomicon1.1.4.jar >/dev/null
 
