@@ -30,11 +30,43 @@ jobs:
       - name: Apply modern compatibility patches
         run: |
           python3 gastronomicon/.github/scripts/modernize_26_2.py
-          # Pin the latest Paper 26.2 stable seen by the compiler and use Jackson's
-          # actual annotations release number (2.22, not the databind 2.22.0 number).
-          sed -i 's#<paper.version>\[26.2.build,26.3.build)</paper.version>#<paper.version>26.2.build.112-stable</paper.version>#' gastronomicon/pom.xml
-          sed -i '/<artifactId>jackson-annotations<\/artifactId>/{n;s#<version>2.22.0</version>#<version>2.22</version>#;}' gastronomicon/pom.xml
-          sed -i 's#actions/checkout@v4#actions/checkout@v5#g; s#actions/setup-java@v4#actions/setup-java@v5#g; s#mvn -B -U clean package#mvn -B clean package#g' gastronomicon/.github/workflows/build.yml
+          python3 - <<'PY'
+          from pathlib import Path
+          pom = Path('gastronomicon/pom.xml')
+          text = pom.read_text(encoding='utf-8')
+          text = text.replace(
+              '<paper.version>[26.2.build,26.3.build)</paper.version>',
+              '<paper.version>26.2.build.112-stable</paper.version>'
+          )
+          text = text.replace(
+              '<artifactId>jackson-annotations</artifactId>\n            <version>2.22.0</version>',
+              '<artifactId>jackson-annotations</artifactId>\n            <version>2.22</version>'
+          )
+          compiler_old = '''<configuration>
+                    <release>${maven.compiler.release}</release>
+                </configuration>'''
+          compiler_new = '''<configuration>
+                    <release>${maven.compiler.release}</release>
+                    <proc>full</proc>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.46</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>'''
+          if compiler_old not in text:
+              raise SystemExit('Maven compiler configuration anchor not found')
+          text = text.replace(compiler_old, compiler_new, 1)
+          pom.write_text(text, encoding='utf-8')
+          workflow = Path('gastronomicon/.github/workflows/build.yml')
+          w = workflow.read_text(encoding='utf-8')
+          w = w.replace('actions/checkout@v4', 'actions/checkout@v5')
+          w = w.replace('actions/setup-java@v4', 'actions/setup-java@v5')
+          w = w.replace('mvn -B -U clean package', 'mvn -B clean package')
+          workflow.write_text(w, encoding='utf-8')
+          PY
 
       - name: Set up Java 25
         uses: actions/setup-java@v5
