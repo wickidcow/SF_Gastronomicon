@@ -42,11 +42,8 @@ jobs:
               '<artifactId>jackson-annotations</artifactId>\n            <version>2.22.0</version>',
               '<artifactId>jackson-annotations</artifactId>\n            <version>2.22</version>'
           )
-          compiler_old = '''<configuration>
-                    <release>${maven.compiler.release}</release>
-                </configuration>'''
-          compiler_new = '''<configuration>
-                    <release>${maven.compiler.release}</release>
+          needle = '<release>${maven.compiler.release}</release>'
+          processor = '''<release>${maven.compiler.release}</release>
                     <proc>full</proc>
                     <annotationProcessorPaths>
                         <path>
@@ -54,12 +51,12 @@ jobs:
                             <artifactId>lombok</artifactId>
                             <version>1.18.46</version>
                         </path>
-                    </annotationProcessorPaths>
-                </configuration>'''
-          if compiler_old not in text:
-              raise SystemExit('Maven compiler configuration anchor not found')
-          text = text.replace(compiler_old, compiler_new, 1)
+                    </annotationProcessorPaths>'''
+          if needle not in text:
+              raise SystemExit('Maven compiler release element not found')
+          text = text.replace(needle, processor, 1)
           pom.write_text(text, encoding='utf-8')
+
           workflow = Path('gastronomicon/.github/workflows/build.yml')
           w = workflow.read_text(encoding='utf-8')
           w = w.replace('actions/checkout@v4', 'actions/checkout@v5')
