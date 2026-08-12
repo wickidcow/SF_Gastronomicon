@@ -36,6 +36,17 @@ jobs:
           java-version: '25'
           cache: maven
 
+      - name: Verify Slimefun Legacy Paper 26.2 Effect API
+        working-directory: slimefun-legacy
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -R --line-number -E 'Effect\.(STEP_SOUND|SMOKE)\b' src/main/java; then
+            echo 'Removal-pending Paper 26.2 Effect API detected in Slimefun Legacy.'
+            exit 1
+          fi
+          echo 'Slimefun Legacy Paper 26.2 Effect API check passed.'
+
       - name: Publish current Slimefun Legacy API to Maven local
         working-directory: slimefun-legacy
         shell: bash
