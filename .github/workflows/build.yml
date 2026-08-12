@@ -59,15 +59,7 @@ jobs:
           echo "jar=$JAR" >> "$GITHUB_OUTPUT"
           echo "name=SF_Gastronomicon${VERSION}.jar" >> "$GITHUB_OUTPUT"
 
-      - name: Upload Actions artifact without recompression
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.output.outputs.name }}
-          path: gastronomicon/${{ steps.output.outputs.jar }}
-          compression-level: 0
-          if-no-files-found: error
-
-      - name: Publish direct unzipped JAR release asset
+      - name: Publish direct JAR release asset
         working-directory: gastronomicon
         env:
           GH_TOKEN: ${{ github.token }}
@@ -81,5 +73,5 @@ jobs:
           else
             gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" \
               --title "SF Gastronomicon ${VERSION}" \
-              --notes "Paper 26.2 / Slimefun Legacy build. The attached SF_Gastronomicon${VERSION}.jar is the direct server JAR, not a ZIP archive."
+              --notes "Paper 26.2 / Slimefun Legacy build. Download SF_Gastronomicon${VERSION}.jar directly from this release."
           fi
