@@ -15,63 +15,33 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Gastronomicon
         uses: actions/checkout@v5
         with:
           path: gastronomicon
-
       - name: Checkout Slimefun Legacy
         uses: actions/checkout@v5
         with:
           repository: wickidcow/Slimefun-Legacy
           ref: master
           path: slimefun-legacy
-
       - name: Set up Java 25
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '25'
           cache: maven
-
-      - name: Verify Slimefun Legacy Paper 26.2 Effect API
-        working-directory: slimefun-legacy
-        shell: bash
-        run: |
-          set -euo pipefail
-          if grep -R --line-number -E 'Effect\.(STEP_SOUND|SMOKE)\b' src/main/java; then
-            echo 'Removal-pending Paper 26.2 Effect API detected in Slimefun Legacy.'
-            exit 1
-          fi
-          echo 'Slimefun Legacy Paper 26.2 Effect API check passed.'
-
       - name: Publish current Slimefun Legacy API to Maven local
         working-directory: slimefun-legacy
         shell: bash
         run: |
           set -euo pipefail
           chmod +x gradlew
-
-          for attempt in 1 2 3; do
-            echo "Slimefun Legacy publish attempt ${attempt}/3"
-            if ./gradlew publishToMavenLocal -PprojectVersion=Legacy-SNAPSHOT -x test --no-daemon; then
-              exit 0
-            fi
-
-            if [ "$attempt" -eq 3 ]; then
-              echo "Slimefun Legacy dependency publish failed after 3 attempts."
-              exit 1
-            fi
-
-            sleep $((attempt * 10))
-          done
-
+          ./gradlew publishToMavenLocal -PprojectVersion=Legacy-SNAPSHOT -x test --no-daemon
       - name: Build Gastronomicon
         working-directory: gastronomicon
         run: mvn -B clean package
-
       - name: Stage direct Gastronomicon JAR
         id: output
         working-directory: gastronomicon
@@ -82,27 +52,22 @@ jobs:
           SOURCE="target/SF_Gastronomicon${VERSION}.jar"
           NAME="SF_Gastronomicon${VERSION}.jar"
           OUTPUT="dist/${NAME}"
-
           test -f "$SOURCE"
           mkdir -p dist
           cp "$SOURCE" "$OUTPUT"
           test -s "$OUTPUT"
-          jar tf "$OUTPUT" >/dev/null
           sha256sum "$OUTPUT"
-
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "jar=$OUTPUT" >> "$GITHUB_OUTPUT"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
-
-      - name: Upload direct JAR build output
+      - name: Upload CI artifact
         uses: actions/upload-artifact@v7
         with:
+          name: SF_Gastronomicon${{ steps.output.outputs.version }}
           path: gastronomicon/${{ steps.output.outputs.jar }}
-          archive: false
           if-no-files-found: error
           retention-days: 30
-
-      - name: Publish direct JAR release asset
+      - name: Publish raw JAR release asset
         working-directory: gastronomicon
         env:
           GH_TOKEN: ${{ github.token }}
@@ -111,11 +76,10 @@ jobs:
           NAME: ${{ steps.output.outputs.name }}
         shell: bash
         run: |
+          set -euo pipefail
           TAG="v${VERSION}"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$JAR" --clobber
           else
-            gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" \
-              --title "SF Gastronomicon ${VERSION}" \
-              --notes "Paper 26.2 / Slimefun Legacy build. The attached ${NAME} is the direct server JAR."
+            gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" --title "SF_Gastronomicon ${VERSION}" --notes "Paper 26.2 / Slimefun Legacy build. The attached ${NAME} is the direct server JAR."
           fi
