@@ -60,13 +60,6 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "jar=$OUTPUT" >> "$GITHUB_OUTPUT"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
-      - name: Upload CI artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: SF_Gastronomicon${{ steps.output.outputs.version }}
-          path: gastronomicon/${{ steps.output.outputs.jar }}
-          if-no-files-found: error
-          retention-days: 30
       - name: Publish raw JAR release asset
         working-directory: gastronomicon
         env:
