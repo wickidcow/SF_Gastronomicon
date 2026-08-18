@@ -2,7 +2,9 @@ name: Build Gastronomicon 26.2 / Slimefun Legacy
 
 on:
   push:
-    branches: [master]
+    branches: ['**']
+  pull_request:
+    branches: ['**']
   workflow_dispatch:
 
 permissions:
@@ -60,7 +62,14 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "jar=$OUTPUT" >> "$GITHUB_OUTPUT"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
+      - name: Upload raw JAR artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: gastronomicon/${{ steps.output.outputs.jar }}
+          archive: false
+          if-no-files-found: error
       - name: Publish raw JAR release asset
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         working-directory: gastronomicon
         env:
           GH_TOKEN: ${{ github.token }}
