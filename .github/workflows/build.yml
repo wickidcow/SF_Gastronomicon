@@ -44,7 +44,17 @@ jobs:
         run: |
           set -euo pipefail
           chmod +x gradlew
-          ./gradlew publishToMavenLocal -PprojectVersion=Legacy-SNAPSHOT -x test --no-daemon
+          for attempt in 1 2 3; do
+            if ./gradlew publishToMavenLocal -PprojectVersion=Legacy-SNAPSHOT -x test --no-daemon --refresh-dependencies; then
+              break
+            fi
+            if [[ "$attempt" -eq 3 ]]; then
+              echo "Slimefun Legacy dependency build failed after 3 attempts." >&2
+              exit 1
+            fi
+            echo "Transient dependency failure on attempt ${attempt}/3; retrying..."
+            sleep $((attempt * 15))
+          done
       - name: Verify Paper 1.21.11 baseline
         working-directory: gastronomicon
         run: mvn -B clean package -Dpaper.version=1.21.11-R0.1-SNAPSHOT
