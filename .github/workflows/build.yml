@@ -1,4 +1,4 @@
-name: Build Gastronomicon 26.2 / Slimefun Legacy
+name: Build Gastronomicon Legacy
 
 on:
   push:
@@ -14,16 +14,20 @@ concurrency:
   group: sf-gastronomicon-build-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  RELEASE_VERSION: "1.1.5"
+  OUTPUT_NAME: "SF_Gastronomicon1.1.5.jar"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Gastronomicon
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: gastronomicon
       - name: Checkout Slimefun Legacy
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: wickidcow/Slimefun-Legacy
           ref: master
@@ -41,27 +45,47 @@ jobs:
           set -euo pipefail
           chmod +x gradlew
           ./gradlew publishToMavenLocal -PprojectVersion=Legacy-SNAPSHOT -x test --no-daemon
-      - name: Build Gastronomicon
+      - name: Verify Paper 1.21.11 baseline
         working-directory: gastronomicon
-        run: mvn -B clean package
+        run: mvn -B clean package -Dpaper.version=1.21.11-R0.1-SNAPSHOT
+      - name: Verify Paper 26.2 primary compatibility
+        working-directory: gastronomicon
+        run: mvn -B clean package -Dpaper.version=26.2.build.112-stable
+      - name: Verify Paper 26.3 alpha compatibility
+        working-directory: gastronomicon
+        run: mvn -B clean package -Dpaper.version=26.3-rc-3.build.1-alpha
+      - name: Rebuild universal release JAR from Paper 1.21.11
+        working-directory: gastronomicon
+        run: mvn -B clean package -Dpaper.version=1.21.11-R0.1-SNAPSHOT
       - name: Stage direct Gastronomicon JAR
         id: output
         working-directory: gastronomicon
         shell: bash
         run: |
           set -euo pipefail
-          VERSION="$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)"
-          SOURCE="target/SF_Gastronomicon${VERSION}.jar"
-          NAME="SF_Gastronomicon${VERSION}.jar"
-          OUTPUT="dist/${NAME}"
-          test -f "$SOURCE"
+          SOURCE="target/${OUTPUT_NAME}"
+          OUTPUT="dist/${OUTPUT_NAME}"
+          test -s "$SOURCE"
           mkdir -p dist
           cp "$SOURCE" "$OUTPUT"
-          test -s "$OUTPUT"
+          unzip -tqq "$OUTPUT"
+          unzip -p "$OUTPUT" plugin.yml | grep -Fq "version: ${RELEASE_VERSION}"
+          python3 - <<'PY'
+          import pathlib, struct, zipfile
+          jar = pathlib.Path('dist/SF_Gastronomicon1.1.5.jar')
+          max_major = 0
+          with zipfile.ZipFile(jar) as zf:
+              for name in zf.namelist():
+                  if name.endswith('.class'):
+                      data = zf.read(name)[:8]
+                      if data[:4] == b'\xca\xfe\xba\xbe':
+                          max_major = max(max_major, struct.unpack('>H', data[6:8])[0])
+          print(f'{jar}: maximum class major version {max_major}')
+          if max_major > 65:
+              raise SystemExit('JAR contains classes newer than Java 21 bytecode')
+          PY
           sha256sum "$OUTPUT"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "jar=$OUTPUT" >> "$GITHUB_OUTPUT"
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
       - name: Upload raw JAR artifact
         uses: actions/upload-artifact@v7
         with:
@@ -73,15 +97,14 @@ jobs:
         working-directory: gastronomicon
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ steps.output.outputs.version }}
           JAR: ${{ steps.output.outputs.jar }}
-          NAME: ${{ steps.output.outputs.name }}
         shell: bash
         run: |
           set -euo pipefail
-          TAG="v${VERSION}"
+          TAG="v${RELEASE_VERSION}"
+          NOTES="Gastronomicon 1.1.5 adds Paper 26.3 alpha compatibility validation while preserving the Paper 1.21.11 / Java 21 universal release baseline and Paper 26.2 as the primary production target."
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" "$JAR" --clobber
           else
-            gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" --title "SF_Gastronomicon ${VERSION}" --notes "Paper 26.2 / Slimefun Legacy build. The attached ${NAME} is the direct server JAR."
+            gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" --title "SF_Gastronomicon ${RELEASE_VERSION}" --notes "$NOTES"
           fi
