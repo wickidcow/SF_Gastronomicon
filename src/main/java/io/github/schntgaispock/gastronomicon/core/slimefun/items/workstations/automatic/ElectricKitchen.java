@@ -21,6 +21,7 @@ import io.github.schntgaispock.gastronomicon.api.recipes.components.RecipeCompon
 import io.github.schntgaispock.gastronomicon.core.slimefun.GastroGroups;
 import io.github.schntgaispock.gastronomicon.core.slimefun.GastroStacks;
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.food.SimpleGastroFood;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.schntgaispock.gastronomicon.util.collections.Counter;
 import io.github.schntgaispock.gastronomicon.util.collections.Pair;
 import io.github.schntgaispock.gastronomicon.util.item.GastroKeys;
@@ -42,7 +43,6 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.AdvancedMenuClickHandler;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.inventory.DirtyChestMenu;
@@ -142,7 +142,7 @@ public class ElectricKitchen extends AContainer {
 
             @Override
             public void onBlockBreak(Block b) {
-                BlockMenu inv = BlockStorage.getInventory(b);
+                BlockMenu inv = SlimefunBlockDataUtil.getMenu(b);
 
                 if (inv != null) {
                     inv.dropItems(b.getLocation(), getInputSlots());
@@ -274,7 +274,7 @@ public class ElectricKitchen extends AContainer {
      */
     @Override
     protected void tick(Block b) {
-        final BlockMenu inv = BlockStorage.getInventory(b);
+        final BlockMenu inv = SlimefunBlockDataUtil.getMenu(b);
         CraftingOperation currentOperation = getMachineProcessor().getOperation(b);
 
         if (currentOperation != null) {

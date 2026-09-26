@@ -7,13 +7,14 @@ import org.bukkit.event.world.StructureGrowEvent;
 
 import io.github.schntgaispock.gastronomicon.Gastronomicon;
 import io.github.schntgaispock.gastronomicon.api.trees.TreeStructure;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
 public class TreeGrowthListener implements Listener {
 
     @EventHandler
     public void onTreeGrow(StructureGrowEvent e) {
-        final String sapling = BlockStorage.checkID(e.getLocation());
+        final String sapling = SlimefunBlockDataUtil.getId(e.getLocation());
         if (sapling == null) return;
 
         final TreeStructure tree = TreeStructure.getLoadedTrees().get(sapling);

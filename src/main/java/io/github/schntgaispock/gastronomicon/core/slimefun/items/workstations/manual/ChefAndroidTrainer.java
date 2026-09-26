@@ -16,6 +16,7 @@ import io.github.mooy1.infinitylib.machines.MenuBlock;
 import io.github.schntgaispock.gastronomicon.Gastronomicon;
 import io.github.schntgaispock.gastronomicon.core.slimefun.GastroGroups;
 import io.github.schntgaispock.gastronomicon.core.slimefun.GastroStacks;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.food.GastroFood;
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.food.SimpleGastroFood;
 import io.github.schntgaispock.gastronomicon.util.item.GastroKeys;
@@ -26,7 +27,6 @@ import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
 import io.github.thebusybiscuit.slimefun4.implementation.handlers.SimpleBlockBreakHandler;
 import io.github.thebusybiscuit.slimefun4.utils.ChatUtils;
 import lombok.Getter;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
@@ -58,7 +58,7 @@ public class ChefAndroidTrainer extends MenuBlock {
 
             @Override
             public void onBlockBreak(Block b) {
-                BlockMenu inv = BlockStorage.getInventory(b);
+                BlockMenu inv = SlimefunBlockDataUtil.getMenu(b);
 
                 if (inv != null) {
                     inv.dropItems(b.getLocation(), getInputSlots());

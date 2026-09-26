@@ -14,6 +14,7 @@ import io.github.schntgaispock.gastronomicon.Gastronomicon;
 import io.github.schntgaispock.gastronomicon.api.recipes.GastroRecipe;
 import io.github.schntgaispock.gastronomicon.api.recipes.MultiStoveRecipe;
 import io.github.schntgaispock.gastronomicon.core.slimefun.recipes.GastroRecipeType;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.core.attributes.EnergyNetComponent;
 import io.github.thebusybiscuit.slimefun4.core.networks.energy.EnergyNetComponentType;
@@ -92,7 +93,7 @@ public class MultiStove extends GastroWorkstation implements EnergyNetComponent 
         super.onNewInstance(menu, b);
 
         menu.addMenuOpeningHandler(player -> {
-            final String temp = BlockStorage.getLocationInfo(menu.getLocation(), TEMPERATURE_KEY);
+            final String temp = SlimefunBlockDataUtil.getData(menu.getLocation(), TEMPERATURE_KEY);
             menu.replaceExistingItem(TEMPERATURE_BUTTON_SLOT,
                 temp == null ? TEMPERATURE_BUTTON_LOW : Temperature.valueOf(temp).getItem(), false);
         });

@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 
 import io.github.schntgaispock.gastronomicon.core.slimefun.GastroGroups;
 import io.github.schntgaispock.gastronomicon.core.slimefun.GastroStacks;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.schntgaispock.gastronomicon.util.collections.CollectionUtil;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -22,7 +23,6 @@ import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.interfaces.InventoryBlock;
 import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
@@ -90,7 +90,7 @@ public class FishingNet extends SlimefunItem implements InventoryBlock, MachineP
         addItemHandler(new SimpleBlockBreakHandler() {
             @Override
             public void onBlockBreak(Block b) {
-                final BlockMenu inv = BlockStorage.getInventory(b);
+                final BlockMenu inv = SlimefunBlockDataUtil.getMenu(b);
                 if (inv != null)
                     inv.dropItems(b.getLocation(), getOutputSlots());
                 machineProcessor.endOperation(b);
@@ -115,7 +115,7 @@ public class FishingNet extends SlimefunItem implements InventoryBlock, MachineP
     }
 
     protected void tick(Block b) {
-        final BlockMenu inv = BlockStorage.getInventory(b);
+        final BlockMenu inv = SlimefunBlockDataUtil.getMenu(b);
         CraftingOperation currentOperation = getMachineProcessor().getOperation(b);
 
         if (currentOperation != null) {

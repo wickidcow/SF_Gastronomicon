@@ -25,6 +25,7 @@ import io.github.schntgaispock.gastronomicon.core.slimefun.items.seeds.AbstractS
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.seeds.DuplicatingSeed;
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.seeds.FruitingSeed;
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.seeds.VineSeed;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
@@ -34,7 +35,7 @@ public class SeedListener implements Listener {
     public void onCropGrow(@Nonnull BlockGrowEvent e) {
         switch (e.getNewState().getType()) {
             case SUGAR_CANE, CACTUS:
-                assignGastroSeed(BlockStorage.check(e.getBlock().getRelative(BlockFace.DOWN)),
+                assignGastroSeed(SlimefunBlockDataUtil.getItem(e.getBlock().getRelative(BlockFace.DOWN)),
                     e.getNewState().getLocation());
                 break;
 
@@ -53,7 +54,7 @@ public class SeedListener implements Listener {
                         final Directional stemData = (Directional) checking.getBlockData();
 
                         if (stemData.getFacing().getOppositeFace().equals(face)) {
-                            assignGastroSeed(BlockStorage.check(checking), e.getNewState().getLocation());
+                            assignGastroSeed(SlimefunBlockDataUtil.getItem(checking), e.getNewState().getLocation());
                             break;
                         }
                     }
@@ -69,7 +70,7 @@ public class SeedListener implements Listener {
     public void onVineGrow(BlockSpreadEvent e) {
         switch (e.getNewState().getType()) {
             case VINE:
-                assignGastroSeed(BlockStorage.check(e.getSource()),
+                assignGastroSeed(SlimefunBlockDataUtil.getItem(e.getSource()),
                     e.getNewState().getLocation());
                 break;
 
@@ -133,7 +134,7 @@ public class SeedListener implements Listener {
                 return null;
         }
 
-        final SlimefunItem item = BlockStorage.check(cropBlock);
+        final SlimefunItem item = SlimefunBlockDataUtil.getItem(cropBlock);
         if (item == null) {
             return null;
         }

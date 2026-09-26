@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import io.github.schntgaispock.gastronomicon.Gastronomicon;
 import io.github.schntgaispock.gastronomicon.core.slimefun.GastroGroups;
 import io.github.schntgaispock.gastronomicon.util.NumberUtil;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.thebusybiscuit.slimefun4.api.events.BlockPlacerPlaceEvent;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
@@ -123,7 +124,7 @@ public abstract class HuntingTrap extends SimpleSlimefunItem<BlockUseHandler> {
             return false;
 
         Gastronomicon.scheduleSyncDelayedTask(() -> {
-            final String id = BlockStorage.checkID(l);
+            final String id = SlimefunBlockDataUtil.getId(l);
             if (id != null && id.equals(getId())) {
                 l.getWorld().playSound(l, Sound.ENTITY_EVOKER_FANGS_ATTACK, SoundCategory.BLOCKS, 1f, 1.5f);
                 triggeredTraps.put(l, true);

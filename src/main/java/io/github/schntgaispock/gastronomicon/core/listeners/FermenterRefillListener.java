@@ -16,11 +16,11 @@ import org.bukkit.potion.PotionType;
 import io.github.schntgaispock.gastronomicon.Gastronomicon;
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.workstations.manual.Fermenter;
 import io.github.schntgaispock.gastronomicon.util.ChunkPDC;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.schntgaispock.gastronomicon.util.item.GastroKeys;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.protection.Interaction;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
 public class FermenterRefillListener implements Listener {
 
@@ -45,7 +45,7 @@ public class FermenterRefillListener implements Listener {
         if (!Slimefun.getProtectionManager().hasPermission(e.getPlayer(), b, Interaction.INTERACT_BLOCK))
             return;
 
-        final SlimefunItem sfItem = BlockStorage.check(b);
+        final SlimefunItem sfItem = SlimefunBlockDataUtil.getItem(b);
         if (sfItem == null || !(sfItem instanceof final Fermenter fermenter))
             return;
 
