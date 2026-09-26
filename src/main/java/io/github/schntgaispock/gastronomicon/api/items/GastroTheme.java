@@ -1,7 +1,7 @@
 package io.github.schntgaispock.gastronomicon.api.items;
 
+import io.github.schntgaispock.gastronomicon.util.StringUtil;
 import lombok.Getter;
-import net.md_5.bungee.api.ChatColor;
 
 public enum GastroTheme {
     WORKSTATION_TOOL("#ffffff"),
@@ -13,12 +13,12 @@ public enum GastroTheme {
     REGULAR_FOOD("#1d90f4"),
     PERFECT_FOOD("#c91df4");
 
-    private @Getter ChatColor color;
-    private @Getter ChatColor loreColor;
+    private final @Getter String color;
+    private final @Getter String loreColor;
 
     GastroTheme(String color, String loreColor) {
-        this.color = ChatColor.of(color);
-        this.loreColor = ChatColor.of(loreColor);
+        this.color = StringUtil.hexColor(color);
+        this.loreColor = StringUtil.hexColor(loreColor);
     }
 
     GastroTheme(String color) {
