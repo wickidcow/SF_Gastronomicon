@@ -13,9 +13,9 @@ import org.bukkit.inventory.ItemStack;
 
 import io.github.schntgaispock.gastronomicon.Gastronomicon;
 import io.github.schntgaispock.gastronomicon.util.RecipeUtil;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
 /**
  * A DuplicatingSeed grows upward.
@@ -47,7 +47,7 @@ public class DuplicatingSeed extends AbstractSeed {
             public void onPlayerPlace(BlockPlaceEvent e) {
                 if (e.getBlock().getState().getLightLevel() <= 7) {
                     e.setCancelled(true);
-                    BlockStorage.clearBlockInfo(e.getBlock(), true);
+                    SlimefunBlockDataUtil.remove(e.getBlock());
                 }
             }
         });

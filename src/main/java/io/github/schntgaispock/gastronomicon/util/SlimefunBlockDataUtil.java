@@ -12,10 +12,11 @@ import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 /**
- * Read-only access to Slimefun Legacy block data without the deprecated BlockStorage facade.
+ * Access to Slimefun Legacy block data without the deprecated BlockStorage facade.
  *
- * <p>This intentionally mirrors BlockStorage's synchronous read behavior: block data is resolved
- * through the current controller and fully loaded before IDs, custom data, or menus are returned.</p>
+ * <p>This intentionally mirrors the BlockStorage behaviors Gastronomicon used: reads synchronously
+ * load block data before access, ID registration delegates to the current block-data controller,
+ * custom values are updated on the loaded block record, and removal delegates to removeBlock.</p>
  */
 public final class SlimefunBlockDataUtil {
 
@@ -32,6 +33,42 @@ public final class SlimefunBlockDataUtil {
         }
 
         return data;
+    }
+
+    public static void register(Block block, String itemId) {
+        register(block.getLocation(), itemId);
+    }
+
+    public static void register(Location location, String itemId) {
+        Slimefun.getDatabaseManager().getBlockDataController().createBlock(location, itemId);
+    }
+
+    public static void setData(Location location, String key, @Nullable String value) {
+        if ("id".equals(key)) {
+            if (value != null) {
+                register(location, value);
+            }
+            return;
+        }
+
+        var data = getLoadedBlockData(location);
+        if (data == null) {
+            return;
+        }
+
+        if (value == null) {
+            data.removeData(key);
+        } else {
+            data.setData(key, value);
+        }
+    }
+
+    public static void remove(Block block) {
+        remove(block.getLocation());
+    }
+
+    public static void remove(Location location) {
+        Slimefun.getDatabaseManager().getBlockDataController().removeBlock(location);
     }
 
     @Nullable

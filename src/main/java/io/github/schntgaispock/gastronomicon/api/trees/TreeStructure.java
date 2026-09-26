@@ -14,12 +14,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.github.schntgaispock.gastronomicon.Gastronomicon;
 import io.github.schntgaispock.gastronomicon.util.NumberUtil;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.schntgaispock.gastronomicon.util.item.HeadTextures;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.skins.PlayerHead;
 import io.github.thebusybiscuit.slimefun4.libraries.dough.skins.PlayerSkin;
 import lombok.Getter;
 import lombok.ToString;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
 @Getter
 @ToString
@@ -90,13 +90,13 @@ public final class TreeStructure {
                             Block b = l.getWorld().getBlockAt(newX, newY, newZ);
                             b.setType(Material.PLAYER_HEAD);
                             if (fruitTexture != null) PlayerHead.setSkin(b, PlayerSkin.fromBase64(fruitTexture), false);
-                            BlockStorage.store(b, getFruit());
+                            SlimefunBlockDataUtil.register(b, getFruit());
                             break;
                         default:
                             final String palette = getPalette()[id - 2];
                             Block b2 = l.getWorld().getBlockAt(newX, newY, newZ);
                             if (palette.endsWith("LEAVES") && NumberUtil.flip(0.1))
-                                BlockStorage.store(b2, sapling);
+                                SlimefunBlockDataUtil.register(b2, sapling);
                             b2.setType(Material.valueOf(palette));
                     }
                 }

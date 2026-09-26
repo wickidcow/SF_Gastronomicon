@@ -21,7 +21,6 @@ import io.github.thebusybiscuit.slimefun4.core.networks.energy.EnergyNetComponen
 import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 
@@ -110,7 +109,7 @@ public class MultiStove extends GastroWorkstation implements EnergyNetComponent 
             return;
         }
         menu.replaceExistingItem(TEMPERATURE_BUTTON_SLOT, t.getItem());
-        BlockStorage.addBlockInfo(menu.getLocation(), TEMPERATURE_KEY, t.name());
+        SlimefunBlockDataUtil.setData(menu.getLocation(), TEMPERATURE_KEY, t.name());
     }
 
     @Override

@@ -27,7 +27,6 @@ import io.github.thebusybiscuit.slimefun4.implementation.items.SimpleSlimefunIte
 import lombok.Getter;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
 @Getter
 @SuppressWarnings("deprecation")
@@ -60,7 +59,7 @@ public abstract class HuntingTrap extends SimpleSlimefunItem<BlockUseHandler> {
         addItemHandler(new SimpleBlockBreakHandler() {
             @Override
             public void onBlockBreak(Block b) {
-                BlockStorage.clearBlockInfo(b);
+                SlimefunBlockDataUtil.remove(b);
                 if (triggeredTraps.containsKey(b.getLocation()) && triggeredTraps.get(b.getLocation()))
                     dropCatch(b.getLocation());
                 triggeredTraps.remove(b.getLocation());

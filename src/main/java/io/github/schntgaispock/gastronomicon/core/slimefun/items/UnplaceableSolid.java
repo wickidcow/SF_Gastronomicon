@@ -5,12 +5,12 @@ import javax.annotation.Nonnull;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
 import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
 public class UnplaceableSolid extends SlimefunItem {
 
@@ -28,7 +28,7 @@ public class UnplaceableSolid extends SlimefunItem {
             @Override
             public void onPlayerPlace(@Nonnull BlockPlaceEvent e) {
                 e.setCancelled(true);
-                BlockStorage.clearBlockInfo(e.getBlock(), false);
+                SlimefunBlockDataUtil.remove(e.getBlock());
             }
         });
     }

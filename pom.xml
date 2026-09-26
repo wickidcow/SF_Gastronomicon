@@ -33,6 +33,10 @@
                 <configuration>
                     <release>${maven.compiler.release}</release>
                     <proc>full</proc>
+                    <showDeprecation>true</showDeprecation>
+                    <compilerArgs>
+                        <arg>-Xlint:deprecation</arg>
+                    </compilerArgs>
                     <annotationProcessorPaths><path><groupId>org.projectlombok</groupId><artifactId>lombok</artifactId><version>1.18.46</version></path></annotationProcessorPaths>
                 </configuration>
             </plugin>

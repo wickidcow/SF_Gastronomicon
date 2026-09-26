@@ -27,7 +27,6 @@ import io.github.schntgaispock.gastronomicon.core.slimefun.items.seeds.FruitingS
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.seeds.VineSeed;
 import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
 public class SeedListener implements Listener {
 
@@ -87,7 +86,7 @@ public class SeedListener implements Listener {
             e.setWillDrop(false);
             seed.getHarvestDrops(e.getBlock().getState(), new ItemStack(Material.AIR), false).forEach(
                 drop -> e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), drop));
-            BlockStorage.clearBlockInfo(e.getBlock(), true);
+            SlimefunBlockDataUtil.remove(e.getBlock());
         }
     }
 
@@ -102,7 +101,7 @@ public class SeedListener implements Listener {
             seed.getHarvestDrops(e.getBlock().getState(), new ItemStack(Material.AIR), false).forEach(
                 drop -> e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), drop));
             b.setType(Material.AIR);
-            BlockStorage.clearBlockInfo(b, true);
+            SlimefunBlockDataUtil.remove(b);
         }
     }
 
@@ -118,9 +117,9 @@ public class SeedListener implements Listener {
             return;
 
         if (item instanceof DuplicatingSeed || item instanceof VineSeed) {
-            BlockStorage.addBlockInfo(l, "id", item.getId());
+            SlimefunBlockDataUtil.register(l, item.getId());
         } else if (item instanceof final FruitingSeed fgs) {
-            BlockStorage.addBlockInfo(l, "id", fgs.getFruitingBody().getId());
+            SlimefunBlockDataUtil.register(l, fgs.getFruitingBody().getId());
         }
     }
 

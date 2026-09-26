@@ -8,7 +8,6 @@ import org.bukkit.event.world.StructureGrowEvent;
 import io.github.schntgaispock.gastronomicon.Gastronomicon;
 import io.github.schntgaispock.gastronomicon.api.trees.TreeStructure;
 import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
 public class TreeGrowthListener implements Listener {
 
@@ -21,7 +20,7 @@ public class TreeGrowthListener implements Listener {
         if (tree == null) return;
 
         e.setCancelled(true);
-        BlockStorage.clearBlockInfo(e.getLocation(), true);
+        SlimefunBlockDataUtil.remove(e.getLocation());
         try {
             tree.build(e.getLocation(), sapling);
         } catch (NullPointerException | IllegalArgumentException err) {
