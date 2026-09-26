@@ -26,7 +26,6 @@ import io.github.thebusybiscuit.slimefun4.libraries.dough.items.CustomItemStack;
 import io.github.thebusybiscuit.slimefun4.utils.HeadTexture;
 import io.github.thebusybiscuit.slimefun4.utils.LoreBuilder;
 import lombok.experimental.UtilityClass;
-import net.md_5.bungee.api.ChatColor;
 
 @UtilityClass
 @SuppressWarnings("deprecation")
@@ -131,7 +130,7 @@ public class GastroStacks {
 
     public static final ItemStack GUIDE_TOOLS_REQUIRED = new CustomItemStack(
         Material.BLACK_STAINED_GLASS_PANE,
-        ChatColor.of("#999999") + "Tools Required");
+        StringUtil.hexColor("#999999") + "Tools Required");
 
     public static final ItemStack GUIDE_CONTAINER_REQUIRED = new CustomItemStack(
         Material.PURPLE_STAINED_GLASS_PANE,
@@ -173,7 +172,7 @@ public class GastroStacks {
     public static final ItemStack MENU_CONTAINER_BORDER = new CustomItemStack(Material.PURPLE_STAINED_GLASS_PANE,
         "&5Container");
     public static final ItemStack MENU_TOOL_BORDER = new CustomItemStack(Material.BLACK_STAINED_GLASS_PANE,
-        ChatColor.of("#999999") + "Tools");
+        StringUtil.hexColor("#999999") + "Tools");
     public static final ItemStack MENU_OUTPUT_BORDER = new CustomItemStack(Material.ORANGE_STAINED_GLASS_PANE,
         "&6Output");
     public static final ItemStack MENU_CRAFT_BUTTON = new CustomItemStack(Material.LIME_STAINED_GLASS_PANE,
