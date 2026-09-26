@@ -8,11 +8,11 @@ import io.github.schntgaispock.gastronomicon.core.slimefun.items.workstations.au
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.workstations.automatic.FishingNet;
 import io.github.schntgaispock.gastronomicon.core.slimefun.items.workstations.manual.Fermenter;
 import io.github.schntgaispock.gastronomicon.util.ChunkPDC;
+import io.github.schntgaispock.gastronomicon.util.SlimefunBlockDataUtil;
 import io.github.schntgaispock.gastronomicon.util.item.GastroKeys;
 import io.github.schntgaispock.slimehud.SlimeHUD;
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
 import lombok.experimental.UtilityClass;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 
 @UtilityClass
@@ -22,7 +22,7 @@ public class SlimeHUDSetup {
     public static void setup() {
         // Electric Kitchen
         SlimeHUD.getHudController().registerCustomHandler(ElectricKitchen.class, request -> {
-            final BlockMenu menu = BlockStorage.getInventory(request.getLocation());
+            final BlockMenu menu = SlimefunBlockDataUtil.getMenu(request.getLocation());
             if (menu == null) return "";
             final ItemStack item = menu.getItemInSlot(15);
             if (item == null) return "&7No android";
