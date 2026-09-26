@@ -70,18 +70,18 @@ public class ItemUtil {
     }
 
     public static String getPotionName(PotionEffectType type) {
-        return switch (type.getName()) {
-            case "SLOW" -> "Slowness";
-            case "FAST_DIGGING" -> "Haste";
-            case "SLOW_DIGGING" -> "Mining Fatigue";
-            case "INCREASE_DAMAGE" -> "Strength";
-            case "HEAL" -> "Instant Health";
-            case "HARM" -> "Instant Damage";
-            case "CONFUSION" -> "Nausea";
-            case "DAMAGE_RESISTANCE" -> "Resistance";
-            case "UNLUCK" -> "Bad Luck";
-            default -> WordUtils.capitalizeFully(type.getName().replaceAll("_", " "));
-        };
+        if (type.equals(PotionEffectType.SLOWNESS)) return "Slowness";
+        if (type.equals(PotionEffectType.HASTE)) return "Haste";
+        if (type.equals(PotionEffectType.MINING_FATIGUE)) return "Mining Fatigue";
+        if (type.equals(PotionEffectType.STRENGTH)) return "Strength";
+        if (type.equals(PotionEffectType.INSTANT_HEALTH)) return "Instant Health";
+        if (type.equals(PotionEffectType.INSTANT_DAMAGE)) return "Instant Damage";
+        if (type.equals(PotionEffectType.JUMP_BOOST)) return "Jump";
+        if (type.equals(PotionEffectType.NAUSEA)) return "Nausea";
+        if (type.equals(PotionEffectType.RESISTANCE)) return "Resistance";
+        if (type.equals(PotionEffectType.UNLUCK)) return "Bad Luck";
+
+        return WordUtils.capitalizeFully(type.getKey().getKey().replace('_', ' '));
     }
 
     /**

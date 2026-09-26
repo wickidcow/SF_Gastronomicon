@@ -83,7 +83,7 @@ public class FermenterRefillListener implements Listener {
         b.getWorld().playSound(b.getLocation(), Sound.ITEM_BUCKET_FILL, SoundCategory.PLAYERS, 1f, 1f);
 
         if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
-            e.getItem().setType(ret);
+            e.getPlayer().getInventory().setItemInMainHand(e.getItem().withType(ret));
         }
     }
 
