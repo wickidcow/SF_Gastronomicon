@@ -44,7 +44,7 @@ public class Refrigerator extends GastroWorkstation implements EnergyNetComponen
 
     @Override
     protected boolean canCraft(BlockMenu menu, Block b, Player p, boolean sendMessage) {
-        final int charge = getCharge(b.getLocation());
+        final long charge = getChargeLong(b.getLocation());
         if (charge < getEnergyPerUse()) {
             Gastronomicon.sendMessage(p, "&eNot enough energy!");
             return false;
@@ -55,7 +55,7 @@ public class Refrigerator extends GastroWorkstation implements EnergyNetComponen
 
     @Override
     protected void onSuccessfulCraft(Block b) {
-        final int charge = getCharge(b.getLocation());
+        final long charge = getChargeLong(b.getLocation());
         setCharge(b.getLocation(), charge - getEnergyPerUse());
     }
     
