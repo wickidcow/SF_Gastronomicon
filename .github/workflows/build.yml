@@ -39,7 +39,7 @@ jobs:
           java-version: '25'
           cache: maven
       - name: Install checksum-verified Apache Maven 3.10.0
-        run: bash scripts/install_maven_3_10.sh
+        run: bash gastronomicon/scripts/install_maven_3_10.sh
       - name: Publish current Slimefun Legacy API to Maven local
         working-directory: slimefun-legacy
         shell: bash
