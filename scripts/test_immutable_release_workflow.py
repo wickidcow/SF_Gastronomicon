@@ -96,11 +96,11 @@ class ImmutableWorkflowTest(unittest.TestCase):
 class RawJarVerificationTest(unittest.TestCase):
     @staticmethod
     def create(root: Path, major: int = 65) -> Path:
-        jar = root / "SF_Gastronomicon1.1.5.jar"
+        jar = root / "SF_Gastronomicon1.1.6.jar"
         header = b"\xca\xfe\xba\xbe\x00\x00" + major.to_bytes(2, "big")
         with zipfile.ZipFile(jar, "w") as z:
             z.writestr("plugin.yml",
-                "name: Gastronomicon\nversion: 1.1.5\n"
+                "name: Gastronomicon\nversion: 1.1.6\n"
                 "main: io.github.schntgaispock.gastronomicon.Gastronomicon\n")
             z.writestr("io/github/schntgaispock/gastronomicon/Gastronomicon.class", header)
         return jar
@@ -108,25 +108,25 @@ class RawJarVerificationTest(unittest.TestCase):
     def test_good_synthetic_jar(self):
         with tempfile.TemporaryDirectory() as tmp:
             jar = self.create(Path(tmp))
-            verify(jar, "1.1.5", hashlib.sha256(jar.read_bytes()).hexdigest())
+            verify(jar, "1.1.6", hashlib.sha256(jar.read_bytes()).hexdigest())
 
     def test_wrong_digest_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             jar = self.create(Path(tmp))
             with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
-                verify(jar, "1.1.5", "0" * 64)
+                verify(jar, "1.1.6", "0" * 64)
 
     def test_java_newer_than_21_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             jar = self.create(Path(tmp), major=69)
             with self.assertRaisesRegex(ValueError, "exceeds Java 21"):
-                verify(jar, "1.1.5", hashlib.sha256(jar.read_bytes()).hexdigest())
+                verify(jar, "1.1.6", hashlib.sha256(jar.read_bytes()).hexdigest())
 
     def test_existing_version_cannot_be_reassigned(self):
         with tempfile.TemporaryDirectory() as tmp:
             jar = self.create(Path(tmp))
             with self.assertRaises(ValueError):
-                verify(jar, "1.1.6", hashlib.sha256(jar.read_bytes()).hexdigest())
+                verify(jar, "1.1.5", hashlib.sha256(jar.read_bytes()).hexdigest())
 
 
 if __name__ == "__main__":
