@@ -36,8 +36,8 @@ def verify_workflow_policy(source: str) -> None:
     for item in required:
         if item not in source:
             raise ValueError("Missing immutable publisher requirement: " + item)
-    if source.count("python3 scripts/verify_immutable_release_jar.py") != 2:
-        raise ValueError("Raw JAR must be checked before and after GitHub publication")
+    if source.count("python3 scripts/verify_immutable_release_jar.py") != 3:
+        raise ValueError("Raw JAR must be checked during staging, before tag creation and after official download")
     if source.index("releases/tags/$TAG") > source.index('gh release create "$TAG"'):
         raise ValueError("Must reject existing release before tag creation")
     if source.index("git/ref/tags/$TAG") > source.index('gh release create "$TAG"'):
