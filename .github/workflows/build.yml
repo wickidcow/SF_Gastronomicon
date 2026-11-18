@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  RELEASE_VERSION: "1.1.5"
-  OUTPUT_NAME: "SF_Gastronomicon1.1.5.jar"
+  RELEASE_VERSION: "1.1.6"
+  OUTPUT_NAME: "SF_Gastronomicon1.1.6.jar"
 
 jobs:
   build:
@@ -88,7 +88,7 @@ jobs:
           unzip -p "$OUTPUT" plugin.yml | grep -Fq "version: ${RELEASE_VERSION}"
           python3 - <<'PY'
           import pathlib, struct, zipfile
-          jar = pathlib.Path('dist/SF_Gastronomicon1.1.5.jar')
+          jar = pathlib.Path('dist/SF_Gastronomicon1.1.6.jar')
           max_major = 0
           with zipfile.ZipFile(jar) as zf:
               for name in zf.namelist():
