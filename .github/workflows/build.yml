@@ -26,12 +26,16 @@ jobs:
         uses: actions/checkout@v6
         with:
           path: gastronomicon
+          persist-credentials: false
       - name: Checkout Slimefun Legacy
         uses: actions/checkout@v6
         with:
           repository: wickidcow/Slimefun-Legacy
           ref: master
           path: slimefun-legacy
+          persist-credentials: false
+      - name: Verify immutable publication policy and synthetic raw-JAR fixtures
+        run: python3 -m unittest discover -s gastronomicon/scripts -p 'test_immutable_release_workflow.py' -v
       - name: Set up Java 25
         uses: actions/setup-java@v5
         with:
@@ -63,9 +67,9 @@ jobs:
       - name: Verify Paper 26.2 primary compatibility
         working-directory: gastronomicon
         run: mvn -B clean package -Dpaper.version=26.2.build.112-stable
-      - name: Verify Paper 26.3 alpha compatibility
+      - name: Verify Paper 26.3 stable compile compatibility
         working-directory: gastronomicon
-        run: mvn -B clean package -Dpaper.version=26.3-rc-3.build.1-alpha
+        run: mvn -B clean package -Dpaper.version=26.3.build.230-stable
       - name: Rebuild universal release JAR from Paper 1.21.11
         working-directory: gastronomicon
         run: mvn -B clean package -Dpaper.version=1.21.11-R0.1-SNAPSHOT
@@ -93,19 +97,21 @@ jobs:
                       if data[:4] == b'\xca\xfe\xba\xbe':
                           max_major = max(max_major, struct.unpack('>H', data[6:8])[0])
           print(f'{jar}: maximum class major version {max_major}')
-          if max_major > 65:
+          if max_major == 0 or max_major > 65:
               raise SystemExit('JAR contains classes newer than Java 21 bytecode')
           PY
           sha256sum "$OUTPUT"
+          python3 scripts/verify_immutable_release_jar.py "$OUTPUT" "$RELEASE_VERSION" "$(sha256sum "$OUTPUT" | cut -d' ' -f1)"
           echo "jar=$OUTPUT" >> "$GITHUB_OUTPUT"
       - name: Upload raw JAR artifact
         uses: actions/upload-artifact@v7
         with:
+          name: ${{ env.OUTPUT_NAME }}
           path: gastronomicon/${{ steps.output.outputs.jar }}
           archive: false
           if-no-files-found: error
-      - name: Publish raw JAR release asset
-        if: github.event_name == 'workflow_dispatch' || github.ref_name == github.event.repository.default_branch
+      - name: Publish only a NEW immutable release from exact green master
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         working-directory: gastronomicon
         env:
           GH_TOKEN: ${{ github.token }}
@@ -113,10 +119,45 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/master" --jq '.object.sha')" = "$GITHUB_SHA"
           TAG="v${RELEASE_VERSION}"
-          NOTES="Gastronomicon 1.1.5 adds Paper 26.3 alpha compatibility validation while preserving the Paper 1.21.11 / Java 21 universal release baseline and Paper 26.2 as the primary production target."
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            gh release upload "$TAG" "$JAR" --clobber
-          else
-            gh release create "$TAG" "$JAR" --target "$GITHUB_SHA" --title "SF_Gastronomicon ${RELEASE_VERSION}" --notes "$NOTES"
+          NAME="${OUTPUT_NAME}"
+          SOURCE="dist/$NAME"
+          test "$JAR" = "$SOURCE"
+          EXPECTED_SHA256="$(sha256sum "$SOURCE" | cut -d' ' -f1)"
+          python3 scripts/verify_immutable_release_jar.py "$SOURCE" "$RELEASE_VERSION" "$EXPECTED_SHA256"
+
+          # Existing official releases are IMMUTABLE: do not even attempt upload.
+          if gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" \
+                 >/dev/null 2>"$RUNNER_TEMP/release.err"; then
+            echo "Official $TAG already exists: skipping without overwriting its asset."
+            exit 0
+          elif ! grep -Fq 'HTTP 404' "$RUNNER_TEMP/release.err"; then
+            cat "$RUNNER_TEMP/release.err" >&2
+            exit 1
           fi
+          # An existing orphan tag must never be retargeted, reused or deleted.
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" \
+                 >/dev/null 2>"$RUNNER_TEMP/tag.err"; then
+            echo "Refusing existing $TAG without a release." >&2
+            exit 1
+          elif ! grep -Fq 'HTTP 404' "$RUNNER_TEMP/tag.err"; then
+            cat "$RUNNER_TEMP/tag.err" >&2
+            exit 1
+          fi
+
+          test -s "docs/releases/$RELEASE_VERSION.md"
+          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/master" --jq '.object.sha')" = "$GITHUB_SHA"
+          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=refs/tags/$TAG" -f "sha=$GITHUB_SHA" > "$RUNNER_TEMP/tag.json"
+          gh release create "$TAG" "$SOURCE" --verify-tag \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "SF_Gastronomicon $RELEASE_VERSION" \
+            --notes-file "docs/releases/$RELEASE_VERSION.md"
+          test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$TAG" --jq '.object.sha')" = "$GITHUB_SHA"
+          mkdir -p "$RUNNER_TEMP/published-jar"
+          gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern "$NAME" --dir "$RUNNER_TEMP/published-jar"
+          python3 scripts/verify_immutable_release_jar.py \
+            "$RUNNER_TEMP/published-jar/$NAME" "$RELEASE_VERSION" "$EXPECTED_SHA256"
