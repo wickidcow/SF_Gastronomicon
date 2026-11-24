@@ -90,7 +90,8 @@ class ImmutableWorkflowTest(unittest.TestCase):
         script = INSTALLER.read_text(encoding="utf-8")
         self.assertIn("archive.apache.org/dist/maven/maven-3", script)
         self.assertIn("sha512sum --check --status", script)
-        self.assertIn("908b1501bfb420bf7c8affb855534a9c", script)
+        self.assertIn("MAVEN_VERSION=3.10.2\n", script)
+        self.assertIn("MAVEN_SHA512=57d2db6b37e7582119137ade544557bba741b29e62109ef81539a2bdfd6d0e641fdd5d8edb014af1816d0510deac6fac8f347433b3a1aa36316ba85aa77b8119\n", script)
 
 
 class RawJarVerificationTest(unittest.TestCase):
